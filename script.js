@@ -64,73 +64,98 @@ const inputClosePin = document.querySelector('.form__input--pin');
 let currentAccount;
 console.log(currentAccount);
 
-btnLogin.addEventListener('click', function(e){
+btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
-  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
-  if(currentAccount.pin === Number(inputLoginPin.value)){
-      // Display balance
-      const displayBalance = function (movements) {
-        const balance = movements.reduce((acc, mov) => acc + mov, 0);
-        labelBalance.textContent = `${balance} EURO`;
-      };
-      // Funds in
-      const displayFundsIn = function (movements) {
-        const sumIn = movements
-          .filter(mov => mov > 0)
-          .reduce((acc, mov) => acc + mov, 0);
-        labelSumIn.textContent = `${sumIn}€`;
-      };
-      // Funds out
-      const displayFundsOut = function (movements) {
-        const sumOut = movements
-          .filter(mov => mov < 0)
-          .reduce((acc, mov) => acc + mov, 0);
-        labelSumOut.textContent = `${Math.abs(sumOut)}€`;
-      };
-      // Intrests from funds when is more than 1 EUR.
-      const intrest = function (movements) {
-        const intrests = movements
-          .filter(mov => mov > 0)
-          .map(deposit => (deposit * 1.2) / 100)
-          .filter((intr, i, arr) => {
-            console.log(`${arr}`);
-            return intr >= 1;
-          })
-          .reduce((acc, dep) => acc + dep, 0);
-          labelSumInterest.textContent = `${intrests}€`;
-          };
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  if (currentAccount.pin === Number(inputLoginPin.value)) {
+    // Display balance
+    const displayBalance = function (acc) {
+      acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+      console.log(acc.balance);
+      labelBalance.textContent = `${acc.balance} EURO`;
+    };
+    // Funds in
+    const displayFundsIn = function (movements) {
+      const sumIn = movements
+        .filter(mov => mov > 0)
+        .reduce((acc, mov) => acc + mov, 0);
+      labelSumIn.textContent = `${sumIn}€`;
+    };
+    // Funds out
+    const displayFundsOut = function (movements) {
+      const sumOut = movements
+        .filter(mov => mov < 0)
+        .reduce((acc, mov) => acc + mov, 0);
+      labelSumOut.textContent = `${Math.abs(sumOut)}€`;
+    };
+    // Intrests from funds when is more than 1 EUR.
+    const intrest = function (movements) {
+      const intrests = movements
+        .filter(mov => mov > 0)
+        .map(deposit => (deposit * 1.2) / 100)
+        .filter((intr, i, arr) => {
+          console.log(`${arr}`);
+          return intr >= 1;
+        })
+        .reduce((acc, dep) => acc + dep, 0);
+      labelSumInterest.textContent = `${intrests}€`;
+    };
 
-        // Display movements
-          
-        const displayMovements = function (movements) {
-          containerMovements.innerHTML = ' ';
-          movements.forEach(function (mov, i) {
-            const type = mov > 0 ? 'deposit' : 'withdrawal';
-            const html = `
+    // Display movements
+    // Sort movements
+    const sortItem = function (acc) {
+      acc.movements.sort((a, b) => a - b);
+    };
+    const displayMovements = function (movements) {
+      containerMovements.innerHTML = ' ';
+      movements.forEach(function (mov, i) {
+        const type = mov > 0 ? 'deposit' : 'withdrawal';
+        const html = `
             <div class="movements__row">
                   <div class="movements__type movements__type--${type}">${
-              i + 1
-            } ${type}</div>
+          i + 1
+        } ${type}</div>
                   <div class="movements__date">3 days ago</div>
                   <div class="movements__value">${mov}€</div>
                 </div>
             `;
-            containerMovements.insertAdjacentHTML('afterbegin', html);
-          });
-        };
-        displayMovements(currentAccount.movements);
+        containerMovements.insertAdjacentHTML('afterbegin', html);
+      });
+    };
 
-          //Calling functions.
-          displayFundsIn(currentAccount.movements);
-          displayFundsOut(currentAccount.movements);
-          intrest(currentAccount.movements);
-          displayBalance(currentAccount.movements);
-  }
-  else{
+    btnTransfer.addEventListener('click', function (e) {
+      e.preventDefault();
+      const amount = Number(inputTransferAmount.value);
+      const reciverAccount = accounts.find(
+        acc => acc.username === inputTransferTo.value
+      );
+      inputTransferAmount.value = inputTransferTo.value = '';
+      if (
+        amount > 0 &&
+        amount <= currentAccount.balance &&
+        reciverAccount?.username !== currentAccount.username
+      ) {
+        reciverAccount.movements.push(amount);
+        currentAccount.movements.push(-amount);
+        updateUI();
+      }
+    });
+
+    //Calling functions.
+    const updateUI = () => {
+      displayMovements(currentAccount.movements);
+      displayBalance(currentAccount);
+    };
+    updateUI();
+    displayFundsIn(currentAccount.movements);
+    displayFundsOut(currentAccount.movements);
+    intrest(currentAccount.movements);
+  } else {
     console.log('Błędny pin.');
   }
-})
-
+});
 
 // Funkcja tworząca inicjały użytkownika.
 const createUserInitials = function (acct) {
@@ -144,3 +169,5 @@ const createUserInitials = function (acct) {
 };
 createUserInitials(accounts);
 console.log(accounts);
+
+console.log(account1.movements.sort((a, b) => a - b));
