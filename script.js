@@ -139,16 +139,16 @@ btnLogin.addEventListener('click', function (e) {
       ) {
         reciverAccount.movements.push(amount);
         currentAccount.movements.push(-amount);
-        updateUI();
+        updateUI(currentAccount);
       }
     });
 
     //Calling functions.
-    const updateUI = () => {
-      displayMovements(currentAccount.movements);
-      displayBalance(currentAccount);
+    const updateUI = (acc) => {
+      displayMovements(acc.movements);
+      displayBalance(acc);
     };
-    updateUI();
+    updateUI(currentAccount);
     displayFundsIn(currentAccount.movements);
     displayFundsOut(currentAccount.movements);
     intrest(currentAccount.movements);
