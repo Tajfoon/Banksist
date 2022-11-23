@@ -142,6 +142,19 @@ btnLogin.addEventListener('click', function (e) {
         updateUI(currentAccount);
       }
     });
+    //Request loan
+    btnLoan.addEventListener('click', function(e)
+    {
+      e.preventDefault();
+      const loanAmount = Number(inputLoanAmount.value);
+      if(loanAmount > 0 && currentAccount.movements.some(mov => mov >= loanAmount * 0.1)){
+        currentAccount.movements.push(loanAmount);
+        updateUI(currentAccount);
+      }
+      else{
+        console.log(`Kwota twojej pożyczki jest za duża. Twoja maksymalna pożyczka wynosi: ${Math.max(...currentAccount.movements) * 0.1}`);
+      }
+    })
 
     //Calling functions.
     const updateUI = (acc) => {
