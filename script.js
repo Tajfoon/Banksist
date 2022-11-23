@@ -157,6 +157,22 @@ btnLogin.addEventListener('click', function (e) {
   }
 });
 
+btnClose.addEventListener('click', function(e)
+{
+  e.preventDefault();
+  if(inputCloseUsername?.value === currentAccount.username && Number(inputClosePin.value) === currentAccount.pin){
+    inputCloseUsername.value = inputClosePin.value = '';
+    console.log('Account was closed');
+    const indexAcc = accounts.findIndex(acc => acc.username === currentAccount.username);
+    
+      console.log(indexAcc);
+      accounts.splice(indexAcc, 1);
+      containerApp.style.opacity = 0;
+    
+  }
+})
+
+
 // Funkcja tworząca inicjały użytkownika.
 const createUserInitials = function (acct) {
   acct.forEach(function (acctRow) {
